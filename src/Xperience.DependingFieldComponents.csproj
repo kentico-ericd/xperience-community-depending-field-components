@@ -1,25 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-	<Version>1.1.0</Version>
-	<Authors>Eric Dugre</Authors>
-	<Company>Kentico</Company>
-	<Product>Xperience by Kentico</Product>
-	<Description>A collection of Xperience by Kentico form components whose visibility depend on the value of another field</Description>
-	<PackageIcon>icon.png</PackageIcon>
-	<TargetFramework>net6.0</TargetFramework>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <RootNamespace>XperienceCommunity.DependingFieldComponents</RootNamespace>
+    <NoWarn>$(NoWarn);S1075</NoWarn>
+    <LangVersion>latest</LangVersion>
+
+	  <!-- Required to prevent type conflicts with existing types -->
+    <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Kentico.Xperience.Admin" Version="[27, 28]" />
-    <PackageReference Include="Kentico.Xperience.WebApp" Version="[27, 28]" />
+    <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute"></AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\img\icon.png" Pack="true" PackagePath="\" />
+    <PackageReference Include="Kentico.Xperience.Admin" />
+    <PackageReference Include="Kentico.Xperience.WebApp" />
   </ItemGroup>
 
 </Project>
