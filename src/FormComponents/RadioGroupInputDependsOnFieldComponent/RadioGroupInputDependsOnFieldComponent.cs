@@ -2,86 +2,72 @@
 
 using Kentico.Xperience.Admin.Base.Forms;
 
-using Xperience.DependingFieldComponents;
-using Xperience.DependingFieldComponents.FormComponents.RadioGroupInputDependsOnFieldComponent;
-using Xperience.DependingFieldComponents.VisibilityConditions;
+using XperienceCommunity.DependingFieldComponents;
+using XperienceCommunity.DependingFieldComponents.FormComponents.RadioGroupInputDependsOnFieldComponent;
+using XperienceCommunity.DependingFieldComponents.VisibilityConditions;
 
-[assembly: RegisterFormComponent(DependingFieldComponentsConstants.RADIOGROUP_IDENTIFIER, typeof(RadioGroupInputDependsOnFieldComponent), DependingFieldComponentsConstants.RADIOGROUP_FIELDDESCRIPTION)]
+[assembly: RegisterFormComponent(DependingFieldComponentsConstants.RADIOGROUP_IDENTIFIER,
+    typeof(RadioGroupInputDependsOnFieldComponent),
+    DependingFieldComponentsConstants.RADIOGROUP_FIELDDESCRIPTION)]
+namespace XperienceCommunity.DependingFieldComponents.FormComponents.RadioGroupInputDependsOnFieldComponent;
 
-namespace Xperience.DependingFieldComponents.FormComponents.RadioGroupInputDependsOnFieldComponent
+/// <summary>
+/// A form component which can be configured to appear based on the value of another field.
+/// </summary>
+[ComponentAttribute(typeof(RadioGroupInputDependsOnFieldAttribute))]
+public class RadioGroupInputDependsOnFieldComponent(ILocalizationService localizationService) :
+    FormComponent<RadioGroupInputDependsOnFieldProperties, RadioGroupClientProperties, string>
 {
-    /// <summary>
-    /// A form component which can be configured to appear based on the value of another field.
-    /// </summary>
-    [ComponentAttribute(typeof(RadioGroupInputDependsOnFieldAttribute))]
-    public class RadioGroupInputDependsOnFieldComponent : FormComponent<RadioGroupInputDependsOnFieldProperties, RadioGroupClientProperties, string>
+    public override string ClientComponentName => "@kentico/xperience-admin-base/RadioGroup";
+
+
+    protected override void ConfigureComponent()
     {
-        private readonly ILocalizationService localizationService;
+        DependingFieldVisibilityCondition.Configure(this);
+
+        base.ConfigureComponent();
+    }
 
 
-        public override string ClientComponentName => "@kentico/xperience-admin-base/RadioGroup";
+    protected override Task ConfigureClientProperties(RadioGroupClientProperties clientProperties)
+    {
+        clientProperties.Options = GetOptions();
+        clientProperties.Value = GetClientValue();
+        clientProperties.Inline = Properties.Inline;
+        clientProperties.AriaLabel = localizationService.LocalizeString(Properties.AriaLabel);
+
+        return base.ConfigureClientProperties(clientProperties);
+    }
 
 
-        /// <summary>
-        /// Initializes a new instance of <see cref="RadioGroupInputDependsOnFieldComponent"/>.
-        /// </summary>
-        public RadioGroupInputDependsOnFieldComponent(ILocalizationService localizationService)
+    public override string GetValue()
+    {
+        string value = base.GetValue();
+
+        return GetOptions()?.FirstOrDefault(o => o.Value == value)?.Value ?? string.Empty;
+    }
+
+
+    private IEnumerable<RadioButton> GetOptions() => KeyValueOptionsParser.ParseDataSource(
+            Properties.Options ?? string.Empty,
+            (value, text) => new RadioButton { Value = value, Label = localizationService.LocalizeString(text) }
+        );
+
+
+    private string GetClientValue()
+    {
+        string value = GetValue();
+        if (string.IsNullOrEmpty(value))
         {
-            this.localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-        }
-
-
-        protected override void ConfigureComponent()
-        {
-            DependingFieldVisibilityCondition.Configure(this);
-
-            base.ConfigureComponent();
-        }
-
-
-        protected override Task ConfigureClientProperties(RadioGroupClientProperties clientProperties)
-        {
-            clientProperties.Options = GetOptions();
-            clientProperties.Value = GetClientValue();
-            clientProperties.Inline = Properties.Inline;
-            clientProperties.AriaLabel = localizationService.LocalizeString(Properties.AriaLabel);
-
-            return base.ConfigureClientProperties(clientProperties);
-        }
-
-
-        public override string GetValue()
-        {
-            var value = base.GetValue();
-
-            return GetOptions()?.FirstOrDefault(o => o.Value == value)?.Value ?? String.Empty;
-        }
-
-
-        private IEnumerable<RadioButton> GetOptions()
-        {
-            return KeyValueOptionsParser.ParseDataSource(
-                Properties.Options,
-                (value, text) => new RadioButton { Value = value, Label = localizationService.LocalizeString(text) }
-            );
-        }
-
-
-        private string GetClientValue()
-        {
-            var value = GetValue();
-            if (string.IsNullOrEmpty(value))
+            var options = GetOptions();
+            if (!options.Any())
             {
-                var options = GetOptions();
-                if (!options.Any())
-                {
-                    return string.Empty;
-                }
-
-                return options.First().Value;
+                return string.Empty;
             }
 
-            return value;
+            return options.First().Value;
         }
+
+        return value;
     }
 }

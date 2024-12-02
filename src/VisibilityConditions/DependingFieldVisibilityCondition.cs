@@ -2,66 +2,52 @@
 
 using Kentico.Xperience.Admin.Base.Forms;
 
-using Xperience.DependingFieldComponents.FormComponents;
+using XperienceCommunity.DependingFieldComponents.FormComponents;
 
-namespace Xperience.DependingFieldComponents.VisibilityConditions
+namespace XperienceCommunity.DependingFieldComponents.VisibilityConditions;
+
+/// <summary>
+/// A visibility condition that toggles the visibility of a field depending on the value of another field.
+/// </summary>
+/// <param name="dependsOn">The name of the field that determines whether the component is visible.</param>
+/// <param name="expectedValue">The value of the field specified by <paramref name="dependsOn"/> which will reveal the depending
+/// field.</param>
+public class DependingFieldVisibilityCondition(string dependsOn, string expectedValue) : VisibilityConditionWithDependency
 {
-    /// <summary>
-    /// A visibility condition that toggles the visibility of a field depending on the value of another field.
-    /// </summary>
-    public class DependingFieldVisibilityCondition : VisibilityConditionWithDependency
+    public override IEnumerable<string> DependsOnFields => new string[] { dependsOn };
+
+    public override bool Evaluate(IFormFieldValueProvider formFieldValueProvider)
     {
-        private readonly string dependsOn;
-        private readonly string expectedValue;
-
-
-        public override IEnumerable<string> DependsOnFields => new string[] { dependsOn };
-
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="DependingFieldVisibilityCondition"/>.
-        /// </summary>
-        /// <param name="dependsOn">The name of the field that determines whether the component is visible.</param>
-        /// <param name="expectedValue">The value of the field specified by <paramref name="dependsOn"/> which will reveal the depending field.</param>
-        public DependingFieldVisibilityCondition(string dependsOn, string expectedValue)
+        if (formFieldValueProvider.TryGet<object>(dependsOn, out object? fieldValue))
         {
-            this.dependsOn = dependsOn;
-            this.expectedValue = expectedValue;
-        }
-
-
-        public override bool Evaluate(IFormFieldValueProvider formFieldValueProvider)
-        {
-            if (formFieldValueProvider.TryGet<object>(dependsOn, out var fieldValue))
+            if (fieldValue is null)
             {
-                if (fieldValue is null)
-                {
-                    return false;
-                }
-
-                var stringRepresentation = ValidationHelper.GetString(fieldValue, String.Empty);
-                if (!String.IsNullOrEmpty(stringRepresentation))
-                {
-                    return stringRepresentation.Equals(expectedValue);
-                }
+                return false;
             }
 
-            return true;
+            string stringRepresentation = ValidationHelper.GetString(fieldValue, string.Empty);
+            if (!string.IsNullOrEmpty(stringRepresentation))
+            {
+                return stringRepresentation.Equals(expectedValue);
+            }
         }
 
+        return true;
+    }
 
-        /// <summary>
-        /// Applies a visibility condition if the required conditions are met.
-        /// </summary>
-        /// <param name="component">The form component to apply the visibility condition to.</param>
-        public static void Configure<TProps, TClientProps, TValue>(FormComponent<TProps, TClientProps, TValue> component)
-            where TProps : DependsOnPropertyProperties, new()
-            where TClientProps : FormComponentClientProperties<TValue>, new()
+
+    /// <summary>
+    /// Applies a visibility condition if the required conditions are met.
+    /// </summary>
+    /// <param name="component">The form component to apply the visibility condition to.</param>
+    public static void Configure<TProps, TClientProps, TValue>(FormComponent<TProps, TClientProps, TValue> component)
+        where TProps : DependsOnPropertyProperties, new()
+        where TClientProps : FormComponentClientProperties<TValue>, new()
+    {
+        if (!string.IsNullOrEmpty(component.Properties.DependsOn) && component.Properties.ExpectedValue is not null)
         {
-            if (!String.IsNullOrEmpty(component.Properties.DependsOn) && component.Properties.ExpectedValue is not null)
-            {
-                component.AddVisibilityCondition(new DependingFieldVisibilityCondition(component.Properties.DependsOn, component.Properties.ExpectedValue));
-            }
+            component.AddVisibilityCondition(new DependingFieldVisibilityCondition(component.Properties.DependsOn,
+                component.Properties.ExpectedValue));
         }
     }
 }

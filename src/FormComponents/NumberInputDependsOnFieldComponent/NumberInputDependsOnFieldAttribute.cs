@@ -1,12 +1,11 @@
 ﻿using Kentico.Xperience.Admin.Base.FormAnnotations;
 
-namespace Xperience.DependingFieldComponents.FormComponents.NumberInputDependsOnFieldComponent
+namespace XperienceCommunity.DependingFieldComponents.FormComponents.NumberInputDependsOnFieldComponent;
+
+public class NumberInputDependsOnFieldAttribute : FormComponentAttribute, IDependsOnPropertyProperties
 {
-    public class NumberInputDependsOnFieldAttribute : FormComponentAttribute, IDependsOnPropertyProperties
-    {
-        public string? DependsOn { get; set; }
+    public string? DependsOn { get; set; }
 
 
-        public string? ExpectedValue { get; set; }
-    }
+    public string? ExpectedValue { get; set; }
 }
