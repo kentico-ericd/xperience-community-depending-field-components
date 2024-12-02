@@ -1,18 +1,17 @@
-[![Nuget](https://img.shields.io/nuget/v/Xperience.DependingFieldComponents)](https://www.nuget.org/packages/Xperience.DependingFieldComponents#versions-body-tab)
-[![build](https://github.com/kentico-ericd/xperience-depending-field-components/actions/workflows/build.yml/badge.svg)](https://github.com/kentico-ericd/xperience-depending-field-components/actions/workflows/build.yml)
+# Xperience Community: Depending field components
 
-# Xperience by Kentico depending field components
+[![Nuget](https://img.shields.io/nuget/v/XperienceCommunity.DependingFieldComponents)](https://www.nuget.org/packages/XperienceCommunity.DependingFieldComponents#versions-body-tab)
+[![build](https://github.com/kentico-ericd/xperience-community-depending-field-components/actions/workflows/build.yml/badge.svg)](https://github.com/kentico-ericd/xperience-community-depending-field-components/actions/workflows/build.yml)
 
 When editing content, often developers will want to hide a field's input based on the value of another field. For example, if an article _might_ contain a link to an external site, there will be a checkbox called "Has external link." If the checkbox is not checked, the text input for the external link should be hidden.
 
 This project adds custom form components to Xperience by Kentico which allows developers to configure depending field functionality directly in the UI or code. These form components can be used in content types and widget properties.
 
-## Compatibility
+## Library Version Matrix
 
-The following Xperience by Kentico versions have been tested and are supported by this project:
-
-- 27.y.z
-- 28.y.z
+|  Xperience Version  |  Library Version  |
+| ------------------- | ----------------- |
+| >= 29.1.0           | >= 2.0.0          |
 
 ## Components
 
